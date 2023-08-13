@@ -62,6 +62,21 @@ public:
     
 
 private:
+
+    //filter alias; we're only using floats
+    //Filters have 12db/oct response by default
+    //This is the peak filter
+    using Filter = juce::dsp::IIR::Filter<float>;
+
+    //ProcessorChain creates 1 processor out of any numbers chained together; calls process() on them in sequence
+    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
+
+    //This is the whole mono signal path w/ all three filter types
+    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
+
+    //MonoChain only processes 1 channel so there's 2 to process stereo audio
+    MonoChain leftChain, rightChain;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQAudioProcessor)
 };
